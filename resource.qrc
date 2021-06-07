@@ -1,0 +1,18 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icon/icons8_folder_64px.png</file>
+        <file>icon/icons8_camcorder_48px.png</file>
+        <file>icon/icons8_google_images_48px.png</file>
+        <file>icon/icons8_image_48px.png</file>
+        <file>icon/icons8_image_gallery_48px.png</file>
+        <file>icon/icons8_reset_48px.png</file>
+        <file>icon/icons8_play_48px.png</file>
+        <file>icon/icons8_zoom_48px.png</file>
+        <file>icon/icons8_replay_48px.png</file>
+        <file>icon/icons8_pause_48px.png</file>
+        <file>icon/icons8_record_48px.png</file>
+        <file>icon/icons8_lens_48px.png</file>
+        <file>icon/icons8_connected_48px.png</file>
+        <file>icons8_lens.ico</file>
+    </qresource>
+</RCC>
