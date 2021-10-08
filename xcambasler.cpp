@@ -17,9 +17,9 @@ XCamBasler::~XCamBasler()
         Camera->StopGrabbing();
         Camera->Close();
         delete Camera;
-
-        PylonTerminate();
     }
+
+    PylonTerminate();
 }
 
 bool XCamBasler::Connect()
