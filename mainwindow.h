@@ -227,6 +227,10 @@ private slots:
 
     void on_lwDatasetImages_currentRowChanged(int currentRow);
 
+    void on_tbClearDatasetImageList_clicked();
+
+    void on_tbClearDatasetLabelList_clicked();
+
 private:
 
     //----- Init ----

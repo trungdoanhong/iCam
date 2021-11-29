@@ -1321,6 +1321,9 @@ void MainWindow::on_tbOpenDatasetImageFolder_clicked()
 
 void MainWindow::on_lwDatasetImages_itemClicked(QListWidgetItem *item)
 {
+    if (item == NULL)
+        return;
+
     QString imagePath = YolovAI.GetImagePath(item->text());
 
     QString imageName = YolovAI.GetImageName(imagePath);
@@ -1332,6 +1335,7 @@ void MainWindow::on_lwDatasetImages_itemClicked(QListWidgetItem *item)
     QPixmap img(imagePath);
     cv::Mat mat = ImageTool::QPixmapToCvMat(img);
     openCvImage = new Mat(mat);
+    YolovAI.BoundShape = ui->cbDetectBound->currentText();
     openCvDrawingImage = YolovAI.DrawBox(mat, imageName);
 
     UpdateLabelImage(openCvDrawingImage, ui->lbCameraDisplay);
@@ -1365,5 +1369,19 @@ void MainWindow::on_tbOpenDatasetLabelFolder_clicked()
 void MainWindow::on_lwDatasetImages_currentRowChanged(int currentRow)
 {
     on_lwDatasetImages_itemClicked(ui->lwDatasetImages->item(currentRow));
+}
+
+
+void MainWindow::on_tbClearDatasetImageList_clicked()
+{
+    ui->lwDatasetImages->clear();
+    YolovAI.DatasetImages.clear();
+}
+
+
+void MainWindow::on_tbClearDatasetLabelList_clicked()
+{
+    ui->lwDatasetLabels->clear();
+    YolovAI.DatasetLabels.clear();
 }
 

@@ -15,6 +15,8 @@ public:
     bool IsOpen();
     unsigned char *Capture();
     void* Camera;
+
+    unsigned char* data = NULL;
 };
 
 #endif // XCAMHIK_H

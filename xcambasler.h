@@ -19,6 +19,8 @@ public:
     unsigned char *Capture();
 
     CInstantCamera* Camera = NULL;
+
+    unsigned char* data = NULL;
 };
 
 #endif // XCAMBASLER_H

@@ -60,9 +60,11 @@ unsigned char *XCamBasler::Capture()
 
     Pylon::PylonInitialize();
 
+    if (data != NULL)
+        free(data);
 
     size_t size = height * width * 3;
-    unsigned char* data = (unsigned char*)std::malloc(size);
+    data = (unsigned char*)std::malloc(size);
 
     CImageFormatConverter formatConverter;
     formatConverter.OutputPixelFormat = PixelType_BGR8packed;

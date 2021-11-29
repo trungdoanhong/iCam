@@ -1955,7 +1955,7 @@
          <property name="geometry">
           <rect>
            <x>0</x>
-           <y>-1421</y>
+           <y>-1456</y>
            <width>320</width>
            <height>3000</height>
           </rect>
@@ -3324,6 +3324,49 @@
             <layout class="QVBoxLayout" name="verticalLayout_16">
              <item>
               <layout class="QGridLayout" name="gridLayout_10">
+               <item row="2" column="2">
+                <widget class="QToolButton" name="tbOpenDatasetImageFolder">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="resource.qrc">
+                   <normaloff>:/icon/icons8_folder_64px.png</normaloff>:/icon/icons8_folder_64px.png</iconset>
+                 </property>
+                </widget>
+               </item>
+               <item row="4" column="0">
+                <widget class="QLabel" name="label_68">
+                 <property name="text">
+                  <string>Label</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="0">
+                <widget class="QLabel" name="label_67">
+                 <property name="text">
+                  <string>Image</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="2" column="1">
+                <widget class="QLineEdit" name="leDatasetImageFolder">
+                 <property name="text">
+                  <string>C:\Users\Admin\Desktop\</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="2">
+                <widget class="QToolButton" name="tbClearDatasetImageList">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="resource.qrc">
+                   <normaloff>:/icon/icons8_reset_48px.png</normaloff>:/icon/icons8_reset_48px.png</iconset>
+                 </property>
+                </widget>
+               </item>
                <item row="0" column="0">
                 <widget class="QLabel" name="label_66">
                  <property name="font">
@@ -3337,18 +3380,31 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="2">
-                <widget class="QToolButton" name="tbOpenDatasetImageFolder">
+               <item row="4" column="1">
+                <widget class="QLineEdit" name="leDatasetLabelFolder">
+                 <property name="text">
+                  <string>C:\Users\Admin\Desktop\</string>
+                 </property>
+                </widget>
+               </item>
+               <item row="3" column="1">
+                <widget class="QListWidget" name="lwDatasetImages"/>
+               </item>
+               <item row="5" column="1">
+                <widget class="QListWidget" name="lwDatasetLabels"/>
+               </item>
+               <item row="5" column="2">
+                <widget class="QToolButton" name="tbClearDatasetLabelList">
                  <property name="text">
                   <string/>
                  </property>
                  <property name="icon">
                   <iconset resource="resource.qrc">
-                   <normaloff>:/icon/icons8_folder_64px.png</normaloff>:/icon/icons8_folder_64px.png</iconset>
+                   <normaloff>:/icon/icons8_reset_48px.png</normaloff>:/icon/icons8_reset_48px.png</iconset>
                  </property>
                 </widget>
                </item>
-               <item row="3" column="2">
+               <item row="4" column="2">
                 <widget class="QToolButton" name="tbOpenDatasetLabelFolder">
                  <property name="text">
                   <string/>
@@ -3359,39 +3415,26 @@
                  </property>
                 </widget>
                </item>
-               <item row="1" column="0">
-                <widget class="QLabel" name="label_67">
-                 <property name="text">
-                  <string>Image</string>
-                 </property>
-                </widget>
-               </item>
                <item row="1" column="1">
-                <widget class="QLineEdit" name="leDatasetImageFolder">
-                 <property name="text">
-                  <string>C:\Users\Admin\Desktop\</string>
-                 </property>
+                <widget class="QComboBox" name="cbDetectBound">
+                 <item>
+                  <property name="text">
+                   <string>Box</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>Segmentation </string>
+                  </property>
+                 </item>
                 </widget>
                </item>
-               <item row="3" column="0">
-                <widget class="QLabel" name="label_68">
+               <item row="1" column="0">
+                <widget class="QLabel" name="label_75">
                  <property name="text">
-                  <string>Label</string>
+                  <string>Bound</string>
                  </property>
                 </widget>
-               </item>
-               <item row="3" column="1">
-                <widget class="QLineEdit" name="leDatasetLabelFolder">
-                 <property name="text">
-                  <string>C:\Users\Admin\Desktop\</string>
-                 </property>
-                </widget>
-               </item>
-               <item row="2" column="1">
-                <widget class="QListWidget" name="lwDatasetImages"/>
-               </item>
-               <item row="4" column="1">
-                <widget class="QListWidget" name="lwDatasetLabels"/>
                </item>
               </layout>
              </item>
