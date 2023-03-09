@@ -1,4 +1,4 @@
-QT       += core gui network serialport
+QT       += core gui network serialport opengl widgets printsupport
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,6 +12,7 @@ SOURCES += \
     AI.cpp \
     ComDevice.cpp \
     ConveyorWidget.cpp \
+    ImageViewer.cpp \
     Robot.cpp \
     VariableTree.cpp \
     camerawidget.cpp \
@@ -27,6 +28,7 @@ HEADERS += \
     ComDevice.h \
     ConveyorWidget.h \
     ImageUnity.h \
+    ImageViewer.h \
     Robot.h \
     VariableTree.h \
     camerawidget.h \

@@ -23,6 +23,20 @@ MainWindow::MainWindow(QWidget *parent)
     QString labelFolder = Settings.value("AI/DatasetLabelFolder", "C:/Users/Admin/Desktop").toString();
     ui->leDatasetLabelFolder->setText(labelFolder);
 
+//    ImageItem = new QGraphicsPixmapItem();
+//    ImageItem->setZValue(-1);
+//    ui->gvCameraDisplay->scene()->addItem(ImageItem);
+//    ui->gvCameraDisplay->ImageItem = ImageItem;
+    ui->gvCameraDisplay->setViewport(new QGLWidget(QGLFormat(QGL::SampleBuffers)));
+    ui->gvCameraDisplay->SelectLineTool();
+
+    connect(ui->pbPointTool_2, &QPushButton::clicked, ui->gvCameraDisplay, &ImageViewer::SelectPointTool);
+    connect(ui->pbLineTool_2, &QPushButton::clicked, ui->gvCameraDisplay, &ImageViewer::SelectLineTool);
+    connect(ui->pbRectTool, &QPushButton::clicked, ui->gvCameraDisplay, &ImageViewer::SelectRectTool);
+    connect(ui->pbQuadangleTool, &QPushButton::clicked, ui->gvCameraDisplay, &ImageViewer::SelectQuadrangleTool);
+    connect(ui->pbAreaTool, &QPushButton::clicked, ui->gvCameraDisplay, &ImageViewer::SelectAreaTool);
+    connect(ui->pbMappingPointTool, &QPushButton::clicked, ui->gvCameraDisplay, &ImageViewer::SelectMappingTool);
+
     initWidgetPointers();
 
     getPerspectiveSettings();
@@ -54,6 +68,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->lbCameraDisplay, SIGNAL(MousePositionChanged(int, int)), this, SLOT(UpdateMousePosition(int, int)));
     connect(ui->lbCameraDisplay, SIGNAL(CalibPointSelected(int, int)), this, SLOT(UpdateCalibPointPosition(int, int)));
     connect(ui->lbCameraDisplay, SIGNAL(MappingPointSelected(int, int)), this, SLOT(DisplayMappingPoint(int, int)));
+
+    connect(ui->gvCameraDisplay, SIGNAL(clickedImage(int, int)), this, SLOT(UpdateMousePosition(int, int)));
     //    //----- Init Pylon ------
 //    FindBaslerCameraList();
 //    //---- Init Mat-----
@@ -305,15 +321,25 @@ void MainWindow::TestHikCameraExampleCode()
 void MainWindow::UpdateLabelImage(Mat mat, QLabel *label)
 {
     QImage img = ImageTool::cvMatToQImage(mat);
-    int width1 = label->parentWidget()->geometry().width();
-    int width2 = label->parentWidget()->parentWidget()->geometry().width();
+//    int width1 = label->parentWidget()->geometry().width();
+//    int width2 = label->parentWidget()->parentWidget()->geometry().width();
     int width3 = label->parentWidget()->parentWidget()->parentWidget()->geometry().width();
 
     int ratio = (float)width3/mat.cols * 100;
 
+//    ui->lbDisplayRatio->setText(QString::number(ui->gvCameraDisplay->CurrentZoom * 100) + "%");
     ui->lbDisplayRatio->setText(QString::number(ratio) + "%");
 
     label->setPixmap(QPixmap::fromImage(img).scaledToWidth(width3));
+//    scene->clear();
+//    scene->addPixmap(QPixmap::fromImage(img));
+//    item->setPixmap(QPixmap::fromImage(img));
+}
+
+void MainWindow::UpdateCameraViewer(Mat mat)
+{
+    ui->lbDisplayRatio->setText(QString::number(ui->gvCameraDisplay->CurrentZoom * 100) + "%");
+    ui->gvCameraDisplay->SetImage(QPixmap::fromImage(ImageTool::cvMatToQImage(mat)));
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)
@@ -329,7 +355,9 @@ void MainWindow::resizeEvent(QResizeEvent *event)
 
 void MainWindow::CaptureCamera()
 {
+    ElapsedTimer.start();
     uint8_t* imageData = IndustryCamera.Capture();
+    qDebug() << "Capture Time: " << ElapsedTimer.elapsed();
     if (openCvImage != NULL)
         delete openCvImage;
 
@@ -337,9 +365,9 @@ void MainWindow::CaptureCamera()
     int w = IndustryCamera.Width();
 
     openCvImage = new Mat(h, w, CV_8UC3, imageData);
-
+    qDebug() << "Mat Time: " << ElapsedTimer.elapsed();
     openCvDrawingImage = openCvImage->clone();
-
+    qDebug() << "Clone Time: " << ElapsedTimer.elapsed();
     QString width = QString::number(openCvImage->cols);
     QString height = QString::number(openCvImage->rows);
     ui->lbResolution->setText(width + " x " + height);
@@ -371,15 +399,17 @@ void MainWindow::CaptureCameraAndDisplay()
     if (ui->cbWarpPerspectiveAuto->isChecked())
     {
         on_pbWarpPerspective_clicked();
-
+        qDebug() << "Warp Time: " << ElapsedTimer.elapsed();
         QElapsedTimer timer;
         timer.start();
         SendCameraImageToExternal();
-        qDebug() << timer.elapsed() << "ms";
+        qDebug() << "Send image: " << timer.elapsed() << "ms";
     }
     else
     {
-        UpdateLabelImage(*openCvImage, ui->lbCameraDisplay);
+//        UpdateLabelImage(*openCvImage, ui->lbCameraDisplay);
+        UpdateCameraViewer(*openCvImage);
+        qDebug() << "Update Label Time: " << ElapsedTimer.elapsed();
     }
 
     //cvVideoCreator.write(*openCvImage);
@@ -406,7 +436,8 @@ void MainWindow::DrawingCameraAndDisplay()
     circle(openCvDrawingImage, Point(x2Mat, y2Mat), 2, Scalar(255, 0, 0), 2);
     putText(openCvDrawingImage, text2.toStdString(), Point(x2Mat + 10, y2Mat), cv::FONT_HERSHEY_SIMPLEX, 1.0f, Scalar(0, 255, 0), 2, cv::LINE_AA);
 
-    UpdateLabelImage(openCvDrawingImage, ui->lbCameraDisplay);
+//    UpdateLabelImage(openCvDrawingImage, ui->lbCameraDisplay);
+    UpdateCameraViewer(openCvDrawingImage);
 }
 
 void MainWindow::UpdateMousePosition(int x, int y)
@@ -417,12 +448,16 @@ void MainWindow::UpdateMousePosition(int x, int y)
 
 void MainWindow::UpdateCalibPointPosition(int x, int y)
 {
-    const QPixmap* pix = ui->lbCameraDisplay->pixmap();
+//    const QPixmap* pix = ui->lbCameraDisplay->pixmap();
 
-    float ratio = (float)openCvImage->cols/pix->width();
 
-    int xMat = x * ratio;
-    int yMat = y * ratio;
+//    float ratio = (float)openCvImage->cols/pix->width();
+
+//    int xMat = x * ratio;
+//    int yMat = y * ratio;
+
+    int xMat = x;
+    int yMat = y;
 
     QString text;
 
@@ -448,12 +483,15 @@ void MainWindow::DisplayMappingPoint(int x, int y)
     if (openCvWarpImage.empty())
         return;
 
-    const QPixmap* pix = ui->lbCameraDisplay->pixmap();
+//    const QPixmap* pix = ui->lbCameraDisplay->pixmap();
 
-    float ratio = (float)openCvImage->cols/pix->width();
+//    float ratio = (float)openCvImage->cols/pix->width();
 
-    int xMat = x * ratio;
-    int yMat = y * ratio;
+//    int xMat = x * ratio;
+//    int yMat = y * ratio;
+
+    int xMat = x;
+    int yMat = y;
 
     QPoint newPoint = Mapping(QPoint(xMat, yMat));
 
@@ -464,7 +502,8 @@ void MainWindow::DisplayMappingPoint(int x, int y)
     putText(openCvDrawingImage, text.toStdString(), Point(xMat + 10, yMat), cv::FONT_HERSHEY_SIMPLEX, 1.0f, Scalar(0, 255, 0), 2, cv::LINE_AA);
     circle(openCvDrawingImage, Point(xMat, yMat), 2, Scalar(0, 0, 255), 2);
 
-    UpdateLabelImage(openCvDrawingImage, ui->lbCameraDisplay);
+//    UpdateLabelImage(openCvDrawingImage, ui->lbCameraDisplay);
+    UpdateCameraViewer(openCvDrawingImage);
 }
 
 QPoint MainWindow::Mapping(QPoint p)
@@ -650,6 +689,8 @@ void MainWindow::on_pbConnectCamera_clicked()
         ui->pbShotVideo->setEnabled(true);
 
         on_pbShotImage_clicked();
+
+        ui->gvCameraDisplay->InitParameter();
     }
 }
 
@@ -756,7 +797,8 @@ void MainWindow::on_pbWarpPerspective_clicked()
     Settings.setValue(QString("CameraCalibration/PerspectivePoint/order"), order);
 
     transformPerspective(*openCvImage, newPoints, openCvWarpImage);
-    UpdateLabelImage(openCvWarpImage, ui->lbCameraDisplay);
+//    UpdateLabelImage(openCvWarpImage, ui->lbCameraDisplay);
+    UpdateCameraViewer(openCvWarpImage);
 }
 
 void MainWindow::on_pbCalculatePeriod_clicked()
@@ -876,24 +918,30 @@ void MainWindow::on_pbFindChessboard_clicked()
     int height = ui->lbChessSizeH->text().toInt();
 
     Size patternsize(width, height);
+
+    float scale = 0.3f;
+
     Mat gray;
     Mat mat = openCvImage->clone();
 
-    cvtColor(*openCvImage, gray, COLOR_BGR2GRAY);
+    cv::resize(mat, gray, cv::Size(mat.cols * scale, mat.rows * scale));
+
+    cvtColor(gray, gray, COLOR_BGR2GRAY);
 
     vector<Point2f> corners;
+
     bool patternfound = findChessboardCorners(gray, patternsize, corners, CALIB_CB_ADAPTIVE_THRESH + CALIB_CB_NORMALIZE_IMAGE + CALIB_CB_FAST_CHECK);
 
     if(patternfound)
     {
-      cornerSubPix(gray, corners, Size(11, 11), Size(-1, -1), TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+//      cornerSubPix(gray, corners, Size(11, 11), Size(-1, -1), TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
 
       PperspectivePoints.clear();
 
-      PperspectivePoints.push_back(cv::Point(corners[0].x, corners[0].y));
-      PperspectivePoints.push_back(cv::Point(corners[width - 1].x, corners[width - 1].y));
-      PperspectivePoints.push_back(cv::Point(corners[width * (height - 1)].x, corners[width * (height - 1)].y));
-      PperspectivePoints.push_back(cv::Point(corners[width * height - 1].x, corners[width * height - 1].y));
+      PperspectivePoints.push_back(cv::Point(corners[0].x, corners[0].y) / scale);
+      PperspectivePoints.push_back(cv::Point(corners[width - 1].x, corners[width - 1].y) / scale);
+      PperspectivePoints.push_back(cv::Point(corners[width * (height - 1)].x, corners[width * (height - 1)].y) / scale);
+      PperspectivePoints.push_back(cv::Point(corners[width * height - 1].x, corners[width * height - 1].y) / scale);
 
       ui->leCorner1X->setText(QString::number(PperspectivePoints[0].x));
       ui->leCorner1Y->setText(QString::number(PperspectivePoints[0].y));
@@ -917,9 +965,10 @@ void MainWindow::on_pbFindChessboard_clicked()
       putText(mat, "4", PperspectivePoints[3], cv::FONT_HERSHEY_SIMPLEX, 2, Scalar(255, 255, 0), 2, cv::LINE_AA);
 
 
-      drawChessboardCorners(mat, patternsize, Mat(corners), patternfound);
+//      drawChessboardCorners(mat, patternsize, Mat(corners), patternfound);
 
-      UpdateLabelImage(mat, ui->lbCameraDisplay);
+//      UpdateLabelImage(mat, ui->lbCameraDisplay);
+      UpdateCameraViewer(mat);
     }
 
 
@@ -1338,7 +1387,8 @@ void MainWindow::on_lwDatasetImages_itemClicked(QListWidgetItem *item)
     YolovAI.BoundShape = ui->cbDetectBound->currentText();
     openCvDrawingImage = YolovAI.DrawBox(mat, imageName);
 
-    UpdateLabelImage(openCvDrawingImage, ui->lbCameraDisplay);
+//    UpdateLabelImage(openCvDrawingImage, ui->lbCameraDisplay);
+    UpdateCameraViewer(openCvDrawingImage);
 }
 
 

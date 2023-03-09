@@ -35,6 +35,12 @@
 #include <QElapsedTimer>
 #include <QInputDialog>
 #include <QListWidgetItem>
+#include <QElapsedTimer>
+#include <QGraphicsPixmapItem>
+#include <QGraphicsView>
+#include <QFrame>
+#include <QtOpenGL>
+#include <ImageViewer.h>
 
 #include "xcammanager.h"
 #include "ImageUnity.h"
@@ -66,6 +72,7 @@ public:
     void TestBaslerCameraExampleCode();
     void TestHikCameraExampleCode();
     void UpdateLabelImage(cv::Mat mat, QLabel* label);
+    void UpdateCameraViewer(cv::Mat mat);
 
     // ---- Camera variables -----
     XCamManager IndustryCamera;
@@ -76,6 +83,9 @@ public:
     QTimer* CameraDisplayUpdatingTimer;
     int CameraInterval = 20;
     QTimer* AutoShootingTimer;
+
+    //------ Camera Display Widget -----
+    QGraphicsPixmapItem* ImageItem;
 
     // ---- Calibration ----
     std::vector<cv::Point> PperspectivePoints;
@@ -105,6 +115,9 @@ public:
     QTcpServer* TcpServer;
     QTcpSocket* PythonTcpClient = NULL;
     QTcpSocket* ExternalSoftwareTcpClient;
+
+    //----- Measuring Timer ----
+    QElapsedTimer ElapsedTimer;
 
     //----- Widget Event -----
 
